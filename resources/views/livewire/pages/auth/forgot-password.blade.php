@@ -53,7 +53,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+            <x-primary-button class="!bg-forest-700 hover:!bg-forest-600 focus:!bg-forest-600 active:!bg-forest-800">
                 {{ __('Email Password Reset Link') }}
             </x-primary-button>
         </div>

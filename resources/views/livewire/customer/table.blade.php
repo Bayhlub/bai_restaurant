@@ -204,29 +204,33 @@ new #[Layout('layouts.customer')] class extends Component {
 
 <div class="min-h-screen pb-28" x-data x-on:order-placed.window="window.scrollTo({ top: document.getElementById('orders').offsetTop - 120, behavior: 'smooth' })">
     {{-- Header --}}
-    <header class="sticky top-0 z-20 bg-white shadow-sm">
-        <div class="flex items-center justify-between gap-2 px-4 py-2">
-            <div class="flex min-w-0 items-center gap-2">
-                <x-app-logo size="h-9 w-9" class="shrink-0 text-emerald-800" />
+    <header class="pattern-lao sticky top-0 z-20 bg-forest-700 shadow-lg">
+        <div class="flex items-center justify-between gap-2 px-4 pt-3">
+            <div class="flex min-w-0 items-center gap-2.5">
+                <x-app-logo size="h-10 w-10" class="shrink-0 text-cream-100" />
                 <div class="min-w-0">
-                    <div class="truncate text-xs font-semibold text-gray-500">{{ app()->getLocale() === 'lo' ? config('restaurant.name_lo') : config('app.name') }}</div>
-                    <div class="text-lg font-bold leading-tight text-gray-900">{{ __('Table') }} {{ $table->number }}</div>
+                    <div class="truncate text-xs font-medium tracking-wide text-cream-200/80">
+                        {{ app()->getLocale() === 'lo' ? config('restaurant.name_lo') : config('app.name') }}
+                    </div>
+                    <div class="font-display text-xl font-bold leading-tight text-cream-50">
+                        {{ __('Table') }} {{ $table->number }}
+                    </div>
                 </div>
             </div>
             <div class="flex shrink-0 items-center gap-1.5">
                 <button type="button" wire:click="callStaff" wire:loading.attr="disabled"
-                        class="whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium {{ $table->needsService() ? 'border-yellow-400 bg-yellow-100 text-yellow-900' : 'border-gray-300 bg-white text-gray-700' }}">
+                        class="whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold transition {{ $table->needsService() ? 'border-terracotta-400 bg-terracotta-400 text-forest-900' : 'border-cream-200/40 text-cream-100 hover:bg-white/10' }}">
                     🔔 {{ $table->needsService() ? __('Called ✓') : __('Call staff') }}
                 </button>
-                <x-language-switcher class="text-xs" />
+                <x-language-switcher :on-dark="true" class="text-xs" />
             </div>
         </div>
 
         {{-- Category tabs --}}
-        <nav class="flex gap-2 overflow-x-auto px-4 pb-3 no-scrollbar">
+        <nav class="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-3 pt-3">
             @foreach ($this->categories as $category)
                 <button type="button" wire:key="tab-{{ $category->id }}" wire:click="selectCategory({{ $category->id }})"
-                    class="shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition {{ $category->id === $activeCategoryId ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700' }}">
+                    class="shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold transition {{ $category->id === $activeCategoryId ? 'bg-cream-50 text-forest-800 shadow-sm' : 'bg-white/10 text-cream-100 hover:bg-white/20' }}">
                     {{ $category->name }}
                 </button>
             @endforeach
@@ -235,78 +239,85 @@ new #[Layout('layouts.customer')] class extends Component {
 
     {{-- Flash messages --}}
     @if ($flash)
-        <div class="mx-4 mt-3 rounded-lg bg-green-100 px-4 py-3 text-sm text-green-800">{{ $flash }}</div>
+        <div class="mx-4 mt-4 rounded-xl border border-forest-100 bg-forest-50 px-4 py-3 text-sm font-medium text-forest-800">{{ $flash }}</div>
     @endif
     @if ($flashError)
-        <div class="mx-4 mt-3 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-800">{{ $flashError }}</div>
+        <div class="mx-4 mt-4 rounded-xl border border-terracotta-100 bg-terracotta-50 px-4 py-3 text-sm font-medium text-terracotta-700">{{ $flashError }}</div>
     @endif
 
     {{-- Menu items --}}
-    <section class="px-4 py-3 space-y-3">
+    <section class="space-y-3 px-4 py-4">
         @forelse ($this->items as $item)
-            <div wire:key="menu-{{ $item->id }}" class="flex gap-3 rounded-xl bg-white p-3 shadow-sm {{ $item->is_available ? '' : 'opacity-60' }}">
+            <div wire:key="menu-{{ $item->id }}"
+                 class="flex gap-3 overflow-hidden rounded-2xl bg-white p-3 shadow-[0_2px_12px_rgba(22,58,42,0.07)] ring-1 ring-cream-200 {{ $item->is_available ? '' : 'opacity-60' }}">
                 @if ($item->image_path)
-                    <img src="{{ $item->imageUrl() }}" alt="" class="h-20 w-20 shrink-0 rounded-lg object-cover">
+                    <img src="{{ $item->imageUrl() }}" alt="" class="h-24 w-24 shrink-0 rounded-xl object-cover">
                 @else
-                    <div class="h-20 w-20 shrink-0 rounded-lg bg-gray-100"></div>
+                    <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-cream-100 text-2xl text-cream-300">🍽</div>
                 @endif
 
                 <div class="flex min-w-0 flex-1 flex-col">
-                    <div class="font-semibold text-gray-900">{{ $item->name }}</div>
+                    <div class="font-display text-lg font-bold leading-snug text-forest-900">{{ $item->name }}</div>
                     @if ($item->description)
-                        <div class="line-clamp-2 text-xs text-gray-500">{{ $item->description }}</div>
+                        <div class="line-clamp-2 text-xs leading-relaxed text-forest-800/60">{{ $item->description }}</div>
                     @endif
-                    <div class="mt-auto flex items-center justify-between pt-1">
-                        <span class="font-semibold text-gray-800">{{ number_format($item->price) }} ₭</span>
+                    <div class="mt-auto flex items-center justify-between pt-2">
+                        <span class="font-display text-lg font-bold text-terracotta-600">{{ number_format($item->price) }} ₭</span>
 
                         @if (! $item->is_available)
-                            <span class="rounded-full bg-gray-200 px-3 py-1 text-xs font-medium text-gray-600">{{ __('Sold out') }}</span>
+                            <span class="rounded-full bg-cream-200 px-3 py-1 text-xs font-semibold text-forest-800/60">{{ __('Sold out') }}</span>
                         @elseif (isset($cart[$item->id]))
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="decrement({{ $item->id }})" class="h-8 w-8 rounded-full bg-gray-200 text-lg font-bold leading-none text-gray-800">−</button>
-                                <span class="w-5 text-center font-semibold">{{ $cart[$item->id]['qty'] }}</span>
-                                <button type="button" wire:click="add({{ $item->id }})" class="h-8 w-8 rounded-full bg-gray-900 text-lg font-bold leading-none text-white">+</button>
+                                <button type="button" wire:click="decrement({{ $item->id }})" class="h-9 w-9 rounded-full bg-cream-200 text-xl font-bold leading-none text-forest-800 transition active:scale-95">−</button>
+                                <span class="w-5 text-center font-bold text-forest-900">{{ $cart[$item->id]['qty'] }}</span>
+                                <button type="button" wire:click="add({{ $item->id }})" class="h-9 w-9 rounded-full bg-forest-700 text-xl font-bold leading-none text-cream-50 shadow-sm transition active:scale-95">+</button>
                             </div>
                         @else
-                            <button type="button" wire:click="add({{ $item->id }})" class="rounded-full bg-gray-900 px-4 py-1.5 text-sm font-medium text-white">+ {{ __('Add') }}</button>
+                            <button type="button" wire:click="add({{ $item->id }})"
+                                    class="rounded-full bg-forest-700 px-4 py-2 text-sm font-semibold text-cream-50 shadow-sm transition hover:bg-forest-600 active:scale-95">
+                                + {{ __('Add') }}
+                            </button>
                         @endif
                     </div>
                 </div>
             </div>
         @empty
-            <p class="py-8 text-center text-sm text-gray-500">{{ __('No items in this category.') }}</p>
+            <p class="py-10 text-center text-sm text-forest-800/50">{{ __('No items in this category.') }}</p>
         @endforelse
     </section>
 
     {{-- Orders so far (polled so kitchen decisions show up on the phone) --}}
     <section id="orders" class="px-4 py-3" wire:poll.4s>
-        <h2 class="mb-2 text-lg font-bold text-gray-900">{{ __('Your orders') }}</h2>
+        <div class="mb-3 flex items-center gap-3">
+            <h2 class="font-display text-xl font-bold text-forest-900">{{ __('Your orders') }}</h2>
+            <span class="h-px flex-1 bg-cream-300"></span>
+        </div>
 
         @if ($this->session && $this->session->orders->isNotEmpty())
             <div class="space-y-3">
                 @foreach ($this->session->orders->sortByDesc('created_at') as $order)
-                    <div wire:key="order-{{ $order->id }}" class="rounded-xl bg-white p-3 shadow-sm">
+                    <div wire:key="order-{{ $order->id }}" class="rounded-2xl bg-white p-3 shadow-[0_2px_12px_rgba(22,58,42,0.07)] ring-1 ring-cream-200">
                         <div class="mb-2 flex items-center justify-between">
-                            <div class="text-sm text-gray-500">#{{ $order->daily_number }} · {{ $order->created_at->format('H:i') }}</div>
+                            <div class="text-sm font-medium text-forest-800/60">#{{ $order->daily_number }} · {{ $order->created_at->format('H:i') }}</div>
                             <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $order->status->badgeClasses() }}">
                                 {{ $order->status->label() }}
                             </span>
                         </div>
 
-                        <ul class="divide-y text-sm">
+                        <ul class="divide-y divide-cream-200 text-sm">
                             @foreach ($order->items as $line)
-                                <li wire:key="line-{{ $line->id }}" class="flex items-start justify-between gap-2 py-1.5 {{ $line->isRejected() ? 'text-gray-400' : 'text-gray-800' }}">
+                                <li wire:key="line-{{ $line->id }}" class="flex items-start justify-between gap-2 py-2 {{ $line->isRejected() ? 'text-forest-800/40' : 'text-forest-900' }}">
                                     <div class="min-w-0">
-                                        <span class="{{ $line->isRejected() ? 'line-through' : '' }}">{{ $line->qty }} × {{ $line->name }}</span>
+                                        <span class="font-medium {{ $line->isRejected() ? 'line-through' : '' }}">{{ $line->qty }} × {{ $line->name }}</span>
                                         @if ($line->note)
-                                            <div class="text-xs text-gray-500">{{ $line->note }}</div>
+                                            <div class="text-xs text-forest-800/50">{{ $line->note }}</div>
                                         @endif
                                         @if ($line->isRejected() && $line->rejection_reason)
-                                            <div class="text-xs text-red-600">{{ $line->rejection_reason }}</div>
+                                            <div class="text-xs font-medium text-terracotta-600">{{ $line->rejection_reason }}</div>
                                         @endif
                                     </div>
                                     <div class="flex shrink-0 items-center gap-2">
-                                        <span class="{{ $line->isRejected() ? 'line-through' : '' }}">{{ number_format($line->lineTotal()) }}</span>
+                                        <span class="font-medium {{ $line->isRejected() ? 'line-through' : '' }}">{{ number_format($line->lineTotal()) }}</span>
                                         <span class="rounded-full px-2 py-0.5 text-[11px] font-medium {{ $line->status->badgeClasses() }}">{{ $line->status->label() }}</span>
                                     </div>
                                 </li>
@@ -314,78 +325,85 @@ new #[Layout('layouts.customer')] class extends Component {
                         </ul>
 
                         @if ($order->note)
-                            <div class="mt-2 text-xs text-gray-500">{{ __('Note') }}: {{ $order->note }}</div>
+                            <div class="mt-2 text-xs text-forest-800/50">{{ __('Note') }}: {{ $order->note }}</div>
                         @endif
                     </div>
                 @endforeach
             </div>
 
-            <div class="mt-3 flex items-center justify-between rounded-xl bg-gray-900 px-4 py-3 text-white">
-                <span class="font-medium">{{ __('Total so far') }}</span>
-                <span class="text-lg font-bold">{{ number_format($this->session->subtotal()) }} ₭</span>
+            <div class="pattern-lao mt-4 flex items-center justify-between rounded-2xl bg-forest-800 px-5 py-4 text-cream-50 shadow-md">
+                <span class="text-sm font-medium uppercase tracking-wide text-cream-200/80">{{ __('Total so far') }}</span>
+                <span class="font-display text-2xl font-bold">{{ number_format($this->session->subtotal()) }} ₭</span>
             </div>
+
             @if ($this->session->billRequested())
-                <div class="mt-3 rounded-xl bg-green-100 px-4 py-3 text-center text-sm font-medium text-green-800">
+                <div class="mt-3 rounded-2xl border border-forest-100 bg-forest-50 px-4 py-3 text-center text-sm font-semibold text-forest-800">
                     💵 {{ __('Bill requested. The cashier will bring your invoice.') }}
                 </div>
             @else
                 <button type="button" wire:click="requestBill" wire:loading.attr="disabled"
-                        class="mt-3 w-full rounded-xl border-2 border-gray-900 bg-white py-3 text-lg font-bold text-gray-900">
+                        class="mt-3 w-full rounded-2xl border-2 border-terracotta-500 bg-white py-3 font-display text-lg font-bold text-terracotta-600 transition hover:bg-terracotta-50 active:scale-[0.99]">
                     💵 {{ __('Request bill') }}
                 </button>
-                <p class="mt-2 text-center text-xs text-gray-500">{{ __('Tap when you are done and the cashier will come with your invoice.') }}</p>
+                <p class="mt-2 text-center text-xs text-forest-800/50">{{ __('Tap when you are done and the cashier will come with your invoice.') }}</p>
             @endif
         @else
-            <p class="py-6 text-center text-sm text-gray-500">{{ __('Nothing ordered yet. Pick something from the menu above!') }}</p>
+            <div class="rounded-2xl border border-dashed border-cream-300 bg-white/60 py-10 text-center">
+                <div class="text-3xl">🍜</div>
+                <p class="mt-2 px-6 text-sm text-forest-800/60">{{ __('Nothing ordered yet. Pick something from the menu above!') }}</p>
+            </div>
         @endif
     </section>
 
     {{-- Sticky cart bar --}}
     @if ($this->cartCount > 0)
-        <div class="fixed inset-x-0 bottom-0 z-30 border-t bg-white p-3 shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
-            <button type="button" wire:click="toggleCart" class="flex w-full items-center justify-between rounded-xl bg-gray-900 px-4 py-3 text-white">
-                <span class="flex items-center gap-2">
-                    <span class="rounded-full bg-white/20 px-2 py-0.5 text-sm font-semibold">{{ $this->cartCount }}</span>
-                    <span class="font-medium">{{ $cartOpen ? __('Hide cart') : __('View cart') }}</span>
+        <div class="fixed inset-x-0 bottom-0 z-30 border-t border-cream-200 bg-cream-50/95 p-3 shadow-[0_-4px_16px_rgba(22,58,42,0.10)] backdrop-blur">
+            <button type="button" wire:click="toggleCart"
+                    class="flex w-full items-center justify-between rounded-2xl bg-forest-700 px-5 py-3.5 text-cream-50 shadow-md transition active:scale-[0.99]">
+                <span class="flex items-center gap-2.5">
+                    <span class="rounded-full bg-terracotta-500 px-2.5 py-0.5 text-sm font-bold">{{ $this->cartCount }}</span>
+                    <span class="font-semibold">{{ $cartOpen ? __('Hide cart') : __('View cart') }}</span>
                 </span>
-                <span class="text-lg font-bold">{{ number_format($this->cartTotal) }} ₭</span>
+                <span class="font-display text-xl font-bold">{{ number_format($this->cartTotal) }} ₭</span>
             </button>
         </div>
     @endif
 
     {{-- Cart sheet --}}
     @if ($cartOpen && $this->cartCount > 0)
-        <div class="fixed inset-0 z-20 bg-black/40" wire:click="toggleCart"></div>
-        <div class="fixed inset-x-0 bottom-[76px] z-30 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl">
-            <h3 class="mb-3 text-lg font-bold text-gray-900">{{ __('Your cart') }}</h3>
+        <div class="fixed inset-0 z-20 bg-forest-900/50" wire:click="toggleCart"></div>
+        <div class="fixed inset-x-0 bottom-[84px] z-30 max-h-[70vh] overflow-y-auto rounded-t-3xl bg-cream-50 p-5 shadow-2xl">
+            <div class="mx-auto mb-3 h-1 w-10 rounded-full bg-cream-300"></div>
+            <h3 class="mb-3 font-display text-xl font-bold text-forest-900">{{ __('Your cart') }}</h3>
 
-            <ul class="divide-y">
+            <ul class="divide-y divide-cream-200">
                 @foreach ($this->cartLines as $line)
                     <li wire:key="cart-{{ $line['id'] }}" class="py-3">
                         <div class="flex items-center justify-between gap-3">
                             <div class="min-w-0 flex-1">
-                                <div class="font-medium text-gray-900">{{ $line['item']->name }}</div>
-                                <div class="text-sm text-gray-500">{{ number_format($line['item']->price) }} ₭</div>
+                                <div class="font-semibold text-forest-900">{{ $line['item']->name }}</div>
+                                <div class="text-sm text-terracotta-600">{{ number_format($line['item']->price) }} ₭</div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button type="button" wire:click="decrement({{ $line['id'] }})" class="h-8 w-8 rounded-full bg-gray-200 text-lg font-bold leading-none">−</button>
-                                <span class="w-5 text-center font-semibold">{{ $line['qty'] }}</span>
-                                <button type="button" wire:click="add({{ $line['id'] }})" class="h-8 w-8 rounded-full bg-gray-900 text-lg font-bold leading-none text-white">+</button>
+                                <button type="button" wire:click="decrement({{ $line['id'] }})" class="h-9 w-9 rounded-full bg-cream-200 text-xl font-bold leading-none text-forest-800 transition active:scale-95">−</button>
+                                <span class="w-5 text-center font-bold text-forest-900">{{ $line['qty'] }}</span>
+                                <button type="button" wire:click="add({{ $line['id'] }})" class="h-9 w-9 rounded-full bg-forest-700 text-xl font-bold leading-none text-cream-50 transition active:scale-95">+</button>
                             </div>
-                            <div class="w-20 text-right font-semibold">{{ number_format($line['total']) }}</div>
+                            <div class="w-20 text-right font-display font-bold text-forest-900">{{ number_format($line['total']) }}</div>
                         </div>
                         <input type="text" wire:model.blur="cart.{{ $line['id'] }}.note" placeholder="{{ __('Note (e.g. not spicy)') }}"
-                               class="mt-2 w-full rounded-md border-gray-300 text-sm">
-                        @error('cart.'.$line['id'].'.note') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+                               class="mt-2 w-full rounded-lg border-cream-300 bg-white text-sm placeholder:text-forest-800/40 focus:border-forest-500 focus:ring-forest-500">
+                        @error('cart.'.$line['id'].'.note') <p class="text-xs text-terracotta-600">{{ $message }}</p> @enderror
                     </li>
                 @endforeach
             </ul>
 
-            <textarea wire:model.blur="orderNote" rows="2" placeholder="{{ __('Note for the kitchen') }}" class="mt-3 w-full rounded-md border-gray-300 text-sm"></textarea>
-            @error('orderNote') <p class="text-xs text-red-600">{{ $message }}</p> @enderror
+            <textarea wire:model.blur="orderNote" rows="2" placeholder="{{ __('Note for the kitchen') }}"
+                      class="mt-3 w-full rounded-lg border-cream-300 bg-white text-sm placeholder:text-forest-800/40 focus:border-forest-500 focus:ring-forest-500"></textarea>
+            @error('orderNote') <p class="text-xs text-terracotta-600">{{ $message }}</p> @enderror
 
             <button type="button" wire:click="submit" wire:loading.attr="disabled"
-                class="mt-3 w-full rounded-xl bg-green-600 py-3 text-lg font-bold text-white disabled:opacity-50">
+                class="mt-3 w-full rounded-2xl bg-terracotta-500 py-3.5 font-display text-lg font-bold text-white shadow-md transition hover:bg-terracotta-600 active:scale-[0.99] disabled:opacity-50">
                 <span wire:loading.remove wire:target="submit">{{ __('Send to kitchen') }} · {{ number_format($this->cartTotal) }} ₭</span>
                 <span wire:loading wire:target="submit">{{ __('Sending…') }}</span>
             </button>

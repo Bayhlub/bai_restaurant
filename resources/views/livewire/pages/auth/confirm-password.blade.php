@@ -54,7 +54,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="flex justify-end mt-4">
-            <x-primary-button>
+            <x-primary-button class="!bg-forest-700 hover:!bg-forest-600 focus:!bg-forest-600 active:!bg-forest-800">
                 {{ __('Confirm') }}
             </x-primary-button>
         </div>

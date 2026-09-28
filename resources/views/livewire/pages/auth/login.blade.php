@@ -63,7 +63,7 @@ new #[Layout('layouts.guest')] class extends Component
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3 !bg-forest-700 hover:!bg-forest-600 focus:!bg-forest-600 active:!bg-forest-800">
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
