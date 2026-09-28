@@ -116,21 +116,37 @@ class KitchenBoardTest extends TestCase
         $this->assertSame(OrderStatus::Served, $order->fresh()->status);
     }
 
-    public function test_refresh_beeps_only_for_tickets_not_seen_before(): void
+    public function test_refresh_alerts_only_for_tickets_not_seen_before(): void
     {
         OrderItem::factory()->for($this->orderForTable('1'))->create();
 
         $component = Volt::test('kitchen.board')
             ->call('refresh')
-            ->assertNotDispatched('kitchen-new-order');
+            ->assertNotDispatched('staff-alert');
 
         OrderItem::factory()->for($this->orderForTable('2'))->create();
 
         $component->call('refresh')
-            ->assertDispatched('kitchen-new-order')
+            ->assertDispatched('staff-alert', title: 'New order', body: 'Table 2', tag: 'kitchen-new-order')
             ->assertSee('Table 2')
             ->call('refresh')
-            ->assertNotDispatched('kitchen-new-order');
+            ->assertNotDispatched('staff-alert');
+    }
+
+    public function test_the_alert_names_every_table_when_several_tickets_arrive_at_once(): void
+    {
+        $component = Volt::test('kitchen.board')->call('refresh');
+
+        OrderItem::factory()->for($this->orderForTable('4'))->create();
+        OrderItem::factory()->for($this->orderForTable('5'))->create();
+
+        $component->call('refresh')
+            ->assertDispatched('staff-alert', title: '2 new orders', body: 'Table 4, Table 5');
+    }
+
+    public function test_the_board_offers_an_alert_toggle(): void
+    {
+        Volt::test('kitchen.board')->assertSee(__('Alerts off'));
     }
 
     public function test_kitchen_can_toggle_menu_availability(): void

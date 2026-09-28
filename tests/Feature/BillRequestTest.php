@@ -72,18 +72,18 @@ class BillRequestTest extends TestCase
         $component = Volt::test('cashier.tables')
             ->assertDontSee(__('Bill requested'))
             ->call('refresh')
-            ->assertNotDispatched('cashier-bill-requested');
+            ->assertNotDispatched('staff-alert');
 
         $table->openSession->requestBill();
 
         $component->call('refresh')
-            ->assertDispatched('cashier-bill-requested')
+            ->assertDispatched('staff-alert', title: __('Bill requested'), body: __('Table').' 7', tag: 'cashier-bill-requested')
             ->assertSee(__('Bill requested'))
             ->assertSee(__('Table').' 7')
             ->assertSee('💵')
             ->assertSee(route('cashier.session', $table->openSession))
             ->call('refresh')
-            ->assertNotDispatched('cashier-bill-requested');
+            ->assertNotDispatched('staff-alert');
     }
 
     public function test_bill_page_shows_the_request_and_paying_clears_it_from_the_grid(): void

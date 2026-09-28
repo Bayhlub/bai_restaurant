@@ -182,5 +182,9 @@
     "Message (English)": "ຂໍ້ຄວາມ (ອັງກິດ)",
     "Saving…": "ກຳລັງບັນທຶກ…",
     "Saved. The new details appear everywhere immediately.": "ບັນທຶກແລ້ວ. ຂໍ້ມູນໃໝ່ຈະສະແດງທຸກບ່ອນທັນທີ.",
-    "The address guests reach the app on is a technical setting and stays in .env as CUSTOMER_URL, because changing it means reprinting the table QR codes.": "ທີ່ຢູ່ທີ່ລູກຄ້າເຂົ້າເຖິງລະບົບເປັນການຕັ້ງຄ່າທາງເຕັກນິກ ຢູ່ໃນ .env (CUSTOMER_URL) ເພາະການປ່ຽນໝາຍເຖິງຕ້ອງພິມ QR ໃໝ່."
+    "The address guests reach the app on is a technical setting and stays in .env as CUSTOMER_URL, because changing it means reprinting the table QR codes.": "ທີ່ຢູ່ທີ່ລູກຄ້າເຂົ້າເຖິງລະບົບເປັນການຕັ້ງຄ່າທາງເຕັກນິກ ຢູ່ໃນ .env (CUSTOMER_URL) ເພາະການປ່ຽນໝາຍເຖິງຕ້ອງພິມ QR ໃໝ່.",
+    "Alerts on": "ເປີດແຈ້ງເຕືອນ",
+    "Alerts off": "ປິດແຈ້ງເຕືອນ",
+    "New order": "ອໍເດີໃໝ່",
+    "{1} New order|[2,*] :count new orders": "{1} ອໍເດີໃໝ່|[2,*] :count ອໍເດີໃໝ່"
 }

@@ -9,26 +9,41 @@ use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    /** Session ids with a pending bill request seen on the last render, to beep only for new ones. */
+    /** Sessions already asking for the bill on the last render, so only new ones alert. */
     public array $knownBillRequestIds = [];
+
+    /** Tables already calling for staff on the last render. */
+    public array $knownServiceCallIds = [];
 
     public function mount(): void
     {
         $this->knownBillRequestIds = $this->billRequestIds();
+        $this->knownServiceCallIds = $this->serviceCallIds();
     }
 
-    /** Called by wire:poll; beeps when a customer has asked for the bill since the last poll. */
+    /** Called by wire:poll; alerts on bills requested and staff called since the last poll. */
     public function refresh(): void
     {
         unset($this->tables);
 
-        $current = $this->billRequestIds();
+        $bills = $this->billRequestIds();
+        $calls = $this->serviceCallIds();
 
-        if (array_diff($current, $this->knownBillRequestIds) !== []) {
-            $this->dispatch('cashier-bill-requested');
+        if (($new = array_diff($bills, $this->knownBillRequestIds)) !== []) {
+            $this->alert(__('Bill requested'), $this->tableNumbersForSessions($new), 'cashier-bill-requested');
         }
 
-        $this->knownBillRequestIds = $current;
+        if (($new = array_diff($calls, $this->knownServiceCallIds)) !== []) {
+            $this->alert(__('Staff called'), $this->tableNumbersForTables($new), 'cashier-staff-called');
+        }
+
+        $this->knownBillRequestIds = $bills;
+        $this->knownServiceCallIds = $calls;
+    }
+
+    private function alert(string $title, string $body, string $tag): void
+    {
+        $this->dispatch('staff-alert', title: $title, body: $body, tag: $tag);
     }
 
     /** @return array<int, int> */
@@ -39,6 +54,33 @@ new class extends Component {
             ->map(fn (Table $table) => $table->openSession->id)
             ->values()
             ->all();
+    }
+
+    /** @return array<int, int> */
+    private function serviceCallIds(): array
+    {
+        return $this->tables
+            ->filter(fn (Table $table) => $table->needsService())
+            ->pluck('id')
+            ->all();
+    }
+
+    /** @param  array<int, int>  $sessionIds */
+    private function tableNumbersForSessions(array $sessionIds): string
+    {
+        return $this->tables
+            ->filter(fn (Table $table) => in_array($table->openSession?->id, $sessionIds, true))
+            ->map(fn (Table $table) => __('Table').' '.$table->number)
+            ->implode(', ');
+    }
+
+    /** @param  array<int, int>  $tableIds */
+    private function tableNumbersForTables(array $tableIds): string
+    {
+        return $this->tables
+            ->whereIn('id', $tableIds)
+            ->map(fn (Table $table) => __('Table').' '.$table->number)
+            ->implode(', ');
     }
 
     #[Computed]
@@ -94,10 +136,9 @@ new class extends Component {
 }; ?>
 
 <div wire:poll.5s="refresh">
-    <x-sound-alert event="cashier-bill-requested" />
-
     <x-page-header :title="__('Cashier')" :subtitle="__('Tables, bills and payments')">
         <x-slot name="actions">
+            <x-staff-alerts />
             <div class="rounded-lg border border-emerald-300 bg-white px-4 py-2 text-right shadow-sm">
                 <div class="text-xs uppercase tracking-wide text-gray-500">{{ __('Today') }}</div>
                 <div class="text-lg font-bold text-emerald-800">{{ number_format($this->todaysTotal) }} ₭</div>

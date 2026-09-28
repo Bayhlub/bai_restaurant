@@ -61,7 +61,7 @@ new class extends Component {
             ->get();
     }
 
-    /** Called by wire:poll; beeps when a ticket appears that we have not seen before. */
+    /** Called by wire:poll; alerts when a ticket appears that we have not seen before. */
     public function refresh(): void
     {
         unset($this->orders);
@@ -70,7 +70,17 @@ new class extends Component {
         $fresh = array_diff($current, $this->knownPendingIds);
 
         if ($fresh !== []) {
-            $this->dispatch('kitchen-new-order');
+            $tables = $this->orders
+                ->whereIn('id', $fresh)
+                ->map(fn (Order $order) => __('Table').' '.$order->session->table->number)
+                ->unique()
+                ->implode(', ');
+
+            $this->dispatch('staff-alert',
+                title: trans_choice('{1} New order|[2,*] :count new orders', count($fresh), ['count' => count($fresh)]),
+                body: $tables,
+                tag: 'kitchen-new-order',
+            );
         }
 
         $this->knownPendingIds = $current;
@@ -150,10 +160,9 @@ new class extends Component {
 }; ?>
 
 <div class="min-h-[calc(100vh-4rem)]" wire:poll.3s="refresh">
-    <x-sound-alert event="kitchen-new-order" />
-
     <x-page-header :title="__('Kitchen')" :subtitle="__('Live orders from the tables')">
         <x-slot name="actions">
+            <x-staff-alerts />
             <x-outline-button type="button" wire:click="$set('availabilityOpen', true)">🍽 {{ __('Availability') }}</x-outline-button>
         </x-slot>
     </x-page-header>
