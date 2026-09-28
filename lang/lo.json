@@ -169,5 +169,18 @@
     "Sales, dishes and cashier totals": "ຍອດຂາຍ, ອາຫານ ແລະ ຍອດພະນັກງານ",
     "Live orders from the tables": "ອໍເດີສົດຈາກໂຕະ",
     "Tables, bills and payments": "ໂຕະ, ບິນ ແລະ ການຈ່າຍເງິນ",
-    "Lao Cuisine": "ອາຫານລາວ"
+    "Lao Cuisine": "ອາຫານລາວ",
+    "Settings": "ຕັ້ງຄ່າ",
+    "Restaurant details": "ຂໍ້ມູນຮ້ານ",
+    "Shown in the app, on QR cards and on printed invoices": "ສະແດງໃນລະບົບ, ບັດ QR ແລະ ໃບບິນ",
+    "Contact": "ຂໍ້ມູນຕິດຕໍ່",
+    "Address": "ທີ່ຢູ່",
+    "Phone": "ເບີໂທ",
+    "Receipt message": "ຂໍ້ຄວາມທ້າຍໃບບິນ",
+    "Printed at the bottom of every invoice.": "ພິມຢູ່ທ້າຍໃບບິນທຸກໃບ.",
+    "Message (Lao)": "ຂໍ້ຄວາມ (ລາວ)",
+    "Message (English)": "ຂໍ້ຄວາມ (ອັງກິດ)",
+    "Saving…": "ກຳລັງບັນທຶກ…",
+    "Saved. The new details appear everywhere immediately.": "ບັນທຶກແລ້ວ. ຂໍ້ມູນໃໝ່ຈະສະແດງທຸກບ່ອນທັນທີ.",
+    "The address guests reach the app on is a technical setting and stays in .env as CUSTOMER_URL, because changing it means reprinting the table QR codes.": "ທີ່ຢູ່ທີ່ລູກຄ້າເຂົ້າເຖິງລະບົບເປັນການຕັ້ງຄ່າທາງເຕັກນິກ ຢູ່ໃນ .env (CUSTOMER_URL) ເພາະການປ່ຽນໝາຍເຖິງຕ້ອງພິມ QR ໃໝ່."
 }

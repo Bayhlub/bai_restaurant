@@ -39,6 +39,7 @@ new class extends Component
             $links[] = ['route' => 'admin.menu', 'label' => __('Menu'), 'pattern' => 'admin.menu', 'icon' => '📋'];
             $links[] = ['route' => 'admin.tables', 'label' => __('Tables'), 'pattern' => 'admin.tables*', 'icon' => '🪑'];
             $links[] = ['route' => 'admin.reports', 'label' => __('Reports'), 'pattern' => 'admin.reports', 'icon' => '📊'];
+            $links[] = ['route' => 'admin.settings', 'label' => __('Settings'), 'pattern' => 'admin.settings', 'icon' => '⚙️'];
         }
 
         return $links;

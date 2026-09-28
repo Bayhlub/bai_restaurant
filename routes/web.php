@@ -50,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('tables', 'admin.tables')->name('tables');
         Route::get('tables/qr', TableQrController::class)->name('tables.qr');
         Volt::route('reports', 'admin.reports')->name('reports');
+        Volt::route('settings', 'admin.settings')->name('settings');
     });
 });
 
