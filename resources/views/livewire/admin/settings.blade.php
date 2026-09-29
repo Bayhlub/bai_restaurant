@@ -1,6 +1,9 @@
 <?php
 
 use App\Support\Settings;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\File;
+use Livewire\Attributes\Computed;
 use Livewire\Volt\Component;
 
 new class extends Component {
@@ -27,6 +30,27 @@ new class extends Component {
         $this->phone = config('restaurant.phone') ?? '';
         $this->footerLo = config('restaurant.receipt_footer_lo') ?? '';
         $this->footerEn = config('restaurant.receipt_footer_en') ?? '';
+    }
+
+    /**
+     * Newest backup and how many are kept, so a backup that quietly stopped
+     * running is visible rather than discovered after a disk failure.
+     *
+     * @return array{count: int, latest: ?CarbonImmutable, stale: bool, path: string}
+     */
+    #[Computed]
+    public function backups(): array
+    {
+        $files = File::glob(rtrim(config('backup.path'), '\\/').DIRECTORY_SEPARATOR.'backup-*.sqlite') ?: [];
+        $newest = collect($files)->max(fn (string $file) => File::lastModified($file));
+        $latest = $newest ? CarbonImmutable::createFromTimestamp($newest) : null;
+
+        return [
+            'count' => count($files),
+            'latest' => $latest,
+            'stale' => $latest === null || $latest->lt(now()->subDays(2)),
+            'path' => config('backup.path'),
+        ];
     }
 
     public function save(): void
@@ -128,6 +152,26 @@ new class extends Component {
                 <span wire:loading wire:target="save" class="text-sm text-gray-500">{{ __('Saving…') }}</span>
             </div>
         </form>
+
+        {{-- Backup status --}}
+        <div class="mt-6 rounded-xl border p-5 shadow-sm {{ $this->backups['stale'] ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white' }}">
+            <h2 class="mb-1 font-semibold text-gray-800">{{ __('Database backup') }}</h2>
+
+            @if ($this->backups['latest'])
+                <p class="text-sm {{ $this->backups['stale'] ? 'font-medium text-red-800' : 'text-gray-600' }}">
+                    {{ __('Last backup') }}: {{ $this->backups['latest']->format('d/m/Y H:i') }}
+                    ({{ $this->backups['latest']->diffForHumans() }}) ·
+                    {{ trans_choice('{1} :count copy kept|[2,*] :count copies kept', $this->backups['count'], ['count' => $this->backups['count']]) }}
+                </p>
+                @if ($this->backups['stale'])
+                    <p class="mt-1 text-sm text-red-800">{{ __('That is more than two days ago — check that the scheduled task is still running.') }}</p>
+                @endif
+            @else
+                <p class="text-sm font-medium text-red-800">{{ __('No backup has been taken yet.') }}</p>
+            @endif
+
+            <p class="mt-2 break-all text-xs text-gray-500">{{ $this->backups['path'] }}</p>
+        </div>
 
         <p class="mt-6 text-sm text-gray-500">
             {{ __('The address guests reach the app on is a technical setting and stays in .env as CUSTOMER_URL, because changing it means reprinting the table QR codes.') }}

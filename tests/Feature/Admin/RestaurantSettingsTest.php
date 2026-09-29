@@ -11,6 +11,7 @@ use App\Models\TableSession;
 use App\Models\User;
 use App\Support\Settings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\File;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -111,6 +112,31 @@ class RestaurantSettingsTest extends TestCase
             ->assertSee('See you again');
 
         $this->get('/admin/tables/qr')->assertSee('Sida Restaurant');
+    }
+
+    public function test_the_page_reports_when_no_backup_has_been_taken(): void
+    {
+        config(['backup.path' => storage_path('framework/testing/empty-backups')]);
+
+        Volt::test('admin.settings')->assertSee(__('No backup has been taken yet.'));
+    }
+
+    public function test_the_page_warns_when_the_newest_backup_is_stale(): void
+    {
+        $dir = storage_path('framework/testing/stale-backups');
+        File::ensureDirectoryExists($dir);
+        $file = $dir.'/backup-2026-01-01_000000.sqlite';
+        File::put($file, 'x');
+        touch($file, now()->subDays(5)->getTimestamp());
+        config(['backup.path' => $dir]);
+
+        try {
+            Volt::test('admin.settings')
+                ->assertSee(__('Last backup'))
+                ->assertSee(__('That is more than two days ago — check that the scheduled task is still running.'));
+        } finally {
+            File::deleteDirectory($dir);
+        }
     }
 
     public function test_settings_are_admin_only(): void

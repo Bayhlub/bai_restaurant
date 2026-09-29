@@ -158,6 +158,51 @@ Notes for anyone working on the code:
   only kept by Tailwind because `./app/Enums/*.php` is in the `content` paths.
 - `public/build` is not committed — run `npm run build` after pulling.
 
+## Backups
+
+`php artisan backup:run` writes a verified snapshot of the database to
+`BACKUP_PATH`. It uses SQLite's `VACUUM INTO`, so the copy is consistent even
+while orders are being taken, and the snapshot is opened and integrity-checked
+before any old one is pruned — a failed backup never costs you a good one.
+
+The scheduler runs it **hourly**, and the command takes at most one snapshot a
+day (`--force` overrides). Hourly rather than nightly because the restaurant PC
+is switched off overnight, so a 3am schedule would never fire.
+
+For the schedule to run at all, Windows needs one task that calls Laravel's
+scheduler every minute. Create it once, in an **administrator** PowerShell:
+
+```powershell
+$php = "$env:USERPROFILE\.config\herd\bin\php84\php.exe"
+$action = New-ScheduledTaskAction -Execute $php -Argument "artisan schedule:run" -WorkingDirectory "C:\Users\baimo\Herd\Bai_restaurant"
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask -TaskName "Bai Restaurant scheduler" -Action $action -Trigger $trigger -RunLevel Highest
+```
+
+Settings:
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `BACKUP_PATH` | `storage/app/backups` | where snapshots go — **point this at another drive or a network share**, since a backup beside the database dies with the disk |
+| `BACKUP_KEEP_DAYS` | `30` | delete snapshots older than this |
+| `BACKUP_ALWAYS_KEEP` | `7` | never prune below this many, however old |
+
+**Admin → Settings** shows when the last backup ran and turns red if it is more
+than two days old, so a backup that quietly stopped gets noticed.
+
+### Restoring
+
+Snapshots are ordinary SQLite files, so restoring is a copy:
+
+```bash
+php artisan down
+cp storage/app/backups/backup-2026-09-29_083856.sqlite database/database.sqlite
+php artisan up
+```
+
+Menu photos live in `storage/app/public` and are **not** part of the database
+snapshot — copy that folder somewhere safe too.
+
 ## Not in version control
 
 `.env`, `database/database.sqlite` (sales history and password hashes) and uploaded

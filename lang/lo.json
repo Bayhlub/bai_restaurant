@@ -186,5 +186,10 @@
     "Alerts on": "ເປີດແຈ້ງເຕືອນ",
     "Alerts off": "ປິດແຈ້ງເຕືອນ",
     "New order": "ອໍເດີໃໝ່",
-    "{1} New order|[2,*] :count new orders": "{1} ອໍເດີໃໝ່|[2,*] :count ອໍເດີໃໝ່"
+    "{1} New order|[2,*] :count new orders": "{1} ອໍເດີໃໝ່|[2,*] :count ອໍເດີໃໝ່",
+    "Database backup": "ສຳຮອງຂໍ້ມູນ",
+    "Last backup": "ສຳຮອງຫຼ້າສຸດ",
+    "{1} :count copy kept|[2,*] :count copies kept": "{1} ເກັບໄວ້ :count ສະບັບ|[2,*] ເກັບໄວ້ :count ສະບັບ",
+    "That is more than two days ago — check that the scheduled task is still running.": "ເກີນສອງມື້ແລ້ວ — ກະລຸນາກວດເບິ່ງວ່າ scheduled task ຍັງເຮັດວຽກຢູ່.",
+    "No backup has been taken yet.": "ຍັງບໍ່ທັນໄດ້ສຳຮອງຂໍ້ມູນ."
 }
